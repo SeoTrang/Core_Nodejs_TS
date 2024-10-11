@@ -14,9 +14,9 @@ export class BcryptService {
   }
 
   // Compares the passwords
-  public static async compare(pass1: string, pass2: string): Promise<boolean> {
+  public static async compare(pass: string, hash: string): Promise<boolean> {
     try {
-      const result = await bcryptjs.compareSync(pass1, pass2);
+      const result = await bcryptjs.compareSync(pass, hash);
       return result;
     } catch (error) {
       console.error('Comparison error: ', error);

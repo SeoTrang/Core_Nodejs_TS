@@ -1,17 +1,8 @@
 import { Router, Request, Response } from 'express';
 import db from '../db/config.db';
+import { DtoGetResponse, DtoPostUpdateDeleteResponse } from 'src/models/response.model';
 
-export type DtoGetResponse = {
-    status: string;
-    recordTotal: number;
-    recordFiltered: number;
-    data: any;
-}
 
-export type DtoPostUpdateDeleteResponse = {
-    status: string;
-    data: number;
-}
 
 export class MainController{
     
@@ -32,7 +23,72 @@ export class MainController{
             res.status(500).json({ error: error.message });
           }
     }
-    static async getLimit(req: Request, res: Response) {
+
+    static async put(req: Request, res: Response) {
+        try {
+          const { table, id } = req.params; // Get table name and id from URL
+          const data = req.body; // Get data from body
+          const affectedRows = await db(table).where({ id }).update(data); // Update data by ID
+          
+          if (affectedRows) {
+            const response: DtoPostUpdateDeleteResponse = {
+                status:'success',
+                data: parseInt(id) 
+            }
+            res.status(200).json(response);
+          } else {
+            res.status(404).json({ message: 'Không tìm thấy bản ghi' });
+          }
+        } catch (error: any) {
+            console.error('Error updating data:', error);
+            res.status(500).json({ error: error.message });
+          }
+      }
+
+      static async setIsDelete(req: Request, res: Response) {
+        try {
+          const { table, id } = req.params; // Get table name and id from URL
+          const data = {
+            is_deleted: 1
+          }
+          const affectedRows = await db(table).where({ id }).update(data); // Update data by ID
+          
+          if (affectedRows) {
+            const response: DtoPostUpdateDeleteResponse = {
+                status:'success',
+                data: parseInt(id) 
+            }
+            res.status(200).json(response);
+          } else {
+            res.status(404).json({ message: 'Không tìm thấy bản ghi' });
+          }
+        } catch (error: any) {
+          console.error('Error updating data:', error);
+          res.status(500).json({ error: error.message });
+        }
+      }
+
+      static async delete(req: Request, res: Response) {
+        try {
+          const { table, id } = req.params; // Get table name and id from URL
+          const affectedRows = await db(table).where({ id }).del(); // Update data by ID
+          
+          if (affectedRows) {
+            const response: DtoPostUpdateDeleteResponse = {
+                status:'success',
+                data: parseInt(id) 
+            }
+            res.status(200).json(response);
+          } else {
+            res.status(404).json({ message: 'Không tìm thấy bản ghi' });
+          }
+        } catch (error: any) {
+            console.error('Error updating data:', error);
+            res.status(500).json({ error: error.message });
+          }
+      }
+      
+    static async get(req: Request, res: Response) {
         try {
             const { table } = req.params; // Lấy tên bảng từ URL
     
