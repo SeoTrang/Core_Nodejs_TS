@@ -24,6 +24,8 @@ const router = express.Router();
 // Gán Knex vào module để sử dụng trong router
 shiftTestSessionModule.model = { Knex: knex }; // Thiết lập model cho module
 
+
+
 // Sử dụng router từ module
 shiftTestSessionModule.Router(shiftTestSessionModule, router);
 

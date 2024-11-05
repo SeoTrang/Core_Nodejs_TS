@@ -2,6 +2,7 @@ module.exports = {
 	keyType: {
 		'created_at': 'date',
 		'updated_at': 'date',
+		'config': 'JSON',
 	},
 	Router(model, router) {
 		/* POST: luyenthi-thpt/api/shift-test-session/tinhdiem/{id} */
