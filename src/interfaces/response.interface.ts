@@ -1,11 +1,11 @@
-export type DtoGetResponse = {
+export type GetResponse = {
     status: string;
     recordTotal: number;
     recordFiltered: number;
     data: any;
 }
 
-export type DtoPostUpdateDeleteResponse = {
+export type PostUpdateDeleteResponse = {
     status: string;
     data: number;
 }
