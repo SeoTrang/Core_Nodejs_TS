@@ -2,6 +2,9 @@
 import { GetResponse, PostUpdateDeleteResponse } from '@interfaces/response.interface';
 import db from '../db/config.db';
 
+import fs from 'fs';
+import path from 'path';
+
 export class MainService {
     
     static async createRecord(table: string, data: any): Promise<PostUpdateDeleteResponse> {
@@ -132,4 +135,30 @@ export class MainService {
             data: records,
         };
     }
+
+    static getKeyTypeFromModule(table: string): any {
+        try {
+            const modulesDir = path.join(process.cwd(), 'src', 'router', 'modules');
+            console.log('Modules Directory:', modulesDir);
+
+            if (fs.existsSync(modulesDir)) {
+                const modulePath = path.join(modulesDir, `${table}.ts`);
+                console.log('Module Path:', modulePath);
+
+                if (fs.existsSync(modulePath)) {
+                    const mod = require(modulePath);
+                    console.log('Module loaded successfully.');
+                    return mod.keyType || null;
+                } else {
+                    console.log(`Module file ${table}.ts does not exist.`);
+                }
+            } else {
+                console.log('Modules directory does not exist.');
+            }
+        } catch (error: any) {
+            console.error('Error loading module:', error.message);
+        }
+        return null; // Trả về null nếu không tìm thấy module hoặc có lỗi
+    }
+    
 }

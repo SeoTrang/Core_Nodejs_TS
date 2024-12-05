@@ -3,6 +3,7 @@ module.exports = {
     keyType: {
         'created_at': 'date',
         'updated_at': 'date',
+        'config': 'json'
     },
 
     Router(model: any, router: any) {
@@ -11,8 +12,8 @@ module.exports = {
   
         
         // Đăng ký các route
-        router.post(`/test/create`, this.create.bind(this, model)); // Sử dụng bind để truyền model
-        router.get(`/test/get`, this.get.bind(this, model)); // Cũng sử dụng bind để truyền model
+        router.post(`/tests/create`, this.create.bind(this, model)); // Sử dụng bind để truyền model
+        router.get(`/tests/get1`, this.get.bind(this, model)); // Cũng sử dụng bind để truyền model
     },
 
     async create(model: any, req: any, res: any, next: any) {

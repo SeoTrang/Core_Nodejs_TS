@@ -1,6 +1,9 @@
 // src/controllers/MainController.ts
 import { Router, Request, Response } from 'express';
 import { MainService } from '@services/main.service';
+import fs from 'fs';
+import path from 'path';
+import { Helper } from '@utils/helper/helper';
 
 export class MainController {
 
@@ -52,6 +55,8 @@ export class MainController {
 
     static async get(req: Request, res: Response) {
         try {
+            console.log('vo');
+            
             const { table } = req.params;
             const conditions = req.query.condition ? JSON.parse(JSON.stringify(req.query.condition)) : [];
             // console.log(req.query.condition);
@@ -73,6 +78,15 @@ export class MainController {
                 limit,
                 page
             );
+            
+            
+            const keyType = MainService.getKeyTypeFromModule(table); // Gọi hàm để lấy keyType
+            console.log('keyType:', keyType);
+            if(keyType){
+                const helper = new Helper();
+                response.data = helper.convertDataTypeResponse(response.data, keyType);
+
+            }
 
             res.status(200).json(response);
         } catch (error: any) {
