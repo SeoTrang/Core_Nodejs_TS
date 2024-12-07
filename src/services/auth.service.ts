@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export class AuthService {
     // Implement JWT authentication logic here
-    async generateAccessToken(user: Partial<User>): Promise<string | null> {
+    static async generateAccessToken(user: Partial<User>): Promise<string | null> {
         try {
             return jwt.sign(
                 { id: user.id, roles: user.roles },
@@ -18,7 +18,7 @@ export class AuthService {
         }
     }
 
-    async generateRefreshToken(user: Partial<User>): Promise<string | null> {
+    static async generateRefreshToken(user: Partial<User>): Promise<string | null> {
         try {
             return jwt.sign(
                 { id: user.id, roles: user.roles }, // Sửa `user.Role` thành `user.role` cho nhất quán
@@ -31,7 +31,7 @@ export class AuthService {
         }
     }
 
-    async refreshTokenCreateNewAccessToken(refreshToken: string): Promise<string | null> {
+    static async refreshTokenCreateNewAccessToken(refreshToken: string): Promise<string | null> {
         // Verify the refresh token
         try {
             const decoded = await this.verifyRefreshToken(refreshToken);
@@ -53,7 +53,7 @@ export class AuthService {
         }
     }
 
-    async verifyAccessToken(token: string): Promise<any | null> {
+    static async verifyAccessToken(token: string): Promise<any | null> {
         try {
             // Verify the token using the secret key
             const decoded = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
@@ -65,7 +65,7 @@ export class AuthService {
         }
     }
 
-    async verifyRefreshToken(token: string): Promise<any | null> {
+    static async verifyRefreshToken(token: string): Promise<any | null> {
         try {
             // Verify the token using the secret key
             const decoded = await jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as string);

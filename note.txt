@@ -52,3 +52,15 @@ Tuy nhiên, nếu bạn đã chỉnh sửa migration cũ (thêm trường `passw
 
 ### Lý do:
 Knex không tự động áp dụng lại các migration cũ sau khi chúng đã được chạy một lần, vì vậy nếu bạn thay đổi file migration cũ, Knex sẽ không nhận diện thay đổi đó. Cách tốt nhất là tạo một migration mới để thực hiện thay đổi.
+
+================== cách rollback ===============
+npx knex migrate:rollback --env development
+
+
+=> sửa xong chạy lại :
+npx knex migrate:list --env development // Kiểm tra trạng thái migration
+
+
+=> update lại migration:
+npx knex migrate:latest --env development
+
