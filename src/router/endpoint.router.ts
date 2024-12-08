@@ -2,17 +2,18 @@ import { Router, Request, Response } from 'express';
 const router = Router();
 
 import { MainController } from 'src/controllers/main.controller';
+import middlewaresMiddleware from 'src/middlewares/middlewares.middleware';
 // Add a record to any table based on 'table'
-router.post('/:table', MainController.create);
+router.post('/:router',middlewaresMiddleware.GuardMiddleware, MainController.create);
 
 // Get all records from any table based on 'table'
-router.get('/:table', MainController.get );
+router.get('/:router',middlewaresMiddleware.GuardMiddleware, MainController.get );
 
 // Update a record in any table based on 'table' and 'id'
-router.put('/:table/:id',MainController.put );
+router.put('/:router/:id',middlewaresMiddleware.GuardMiddleware, MainController.put );
 
 // Delete a record in any table based on 'table' and 'id'
-router.delete('/:table/destroy/:id', MainController.delete);
-router.delete('/:table/:id', MainController.setIsDelete);
+router.delete('/:router/destroy/:id',middlewaresMiddleware.GuardMiddleware, MainController.delete);
+router.delete('/:router/:id',middlewaresMiddleware.GuardMiddleware, MainController.setIsDelete);
 
 export default router;

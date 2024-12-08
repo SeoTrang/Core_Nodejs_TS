@@ -69,15 +69,27 @@ export class MainService {
         let query = db(table).select('*');
 
         // console.log(query.toSQL());
+        console.log(conditions);
+        
 
         if (Array.isArray(conditions)) {
             conditions.forEach((condition: any) => {
                 const key = condition.key;
-                let value = condition.value;
+                // let value = decodeURI(condition.value).toString();
+                // console.log(value);
+                let value: any;
+                try {
+                    value = decodeURIComponent(condition.value).toString();
+                } catch (e) {
+                    console.error(`Error decoding value: ${condition.value}`, e);
+                    value = condition.value;  // Nếu có lỗi, giữ nguyên giá trị ban đầu
+                }
+                
                 const compare = condition.compare || '=';
+                const orWhere = condition.orWhere || 'and';
 
                 const columnType = columnsMap[key];
-
+                
                 if (columnType) {
                     if (columnType.includes('int')) {
                         value = parseInt(value, 10);
@@ -86,21 +98,59 @@ export class MainService {
                     } else if (columnType.includes('date') || columnType.includes('datetime') || columnType.includes('timestamp')) {
                         value = new Date(value);
                     } else if (columnType.includes('varchar') || columnType.includes('text')) {
+                        console.log(value);
+                        
                         value = value.toString();
                     }
+                    console.log(value);
+                    
+                    if(orWhere === 'or'){
 
-                    if (compare.toLowerCase() === 'like') {
-                        const likeValue = value.includes('%') ? value : `%${value}%`;
-                        query = query.where(key, 'LIKE', likeValue);
-                    } else if (compare.toLowerCase() === 'in') {
-                        const values = value.split(',');
-                        query = query.whereIn(key, values);
-                    } else if (compare.toLowerCase() === 'between') {
-                        const values = value.split(',');
-                        query = query.whereBetween(key, [values[0], values[1]]);
-                    } else if (['>', '>=', '<', '<=', '=', '!=', '<>'].includes(compare)) {
-                        query = query.where(key, compare, value);
+                        if (compare.toLowerCase() === 'like') {
+                            const likeValue = value;
+                            query = query.orWhere(key, 'LIKE', `%${likeValue}%`);
+                        }if (compare.toLowerCase() === 'NOT LIKE') {
+                            const likeValue = value;
+                            query = query.orWhere(key, 'notLike', `%${likeValue}%`);
+                        } else if (compare.toLowerCase() === 'lessLike') {
+                            const likeValue = value;
+                            query = query.orWhere(key, 'LIKE', `%${likeValue}`);
+                        } else if (compare.toLowerCase() === 'rightLike') {
+                            const likeValue = value;
+                            query = query.orWhere(key, 'LIKE', `${likeValue}%`);
+                        } else if (compare.toLowerCase() === 'in') {
+                            const values = value.split(',');
+                            query = query.orWhereIn(key, values);
+                        } else if (compare.toLowerCase() === 'between') {
+                            const values = value.split(',');
+                            query = query.orWhereBetween(key, [values[0], values[1]]);
+                        } else if (['>', '>=', '<', '<=', '=', '!=', '<>'].includes(compare)) {
+                            query = query.orWhere(key, compare, value);
+                        }
+                    }else if(orWhere === 'and'){
+                        if (compare.toLowerCase() === 'like') {
+                            const likeValue = value;
+                            query = query.where(key, 'LIKE', `%${likeValue}%`);
+                        }if (compare.toLowerCase() === 'NOT LIKE') {
+                            const likeValue = value;
+                            query = query.where(key, 'notLike', `%${likeValue}%`);
+                        } else if (compare.toLowerCase() === 'lessLike') {
+                            const likeValue = value;
+                            query = query.where(key, 'LIKE', `%${likeValue}`);
+                        } else if (compare.toLowerCase() === 'rightLike') {
+                            const likeValue = value;
+                            query = query.where(key, 'LIKE', `${likeValue}%`);
+                        } else if (compare.toLowerCase() === 'in') {
+                            const values = value.split(',');
+                            query = query.whereIn(key, values);
+                        } else if (compare.toLowerCase() === 'between') {
+                            const values = value.split(',');
+                            query = query.whereBetween(key, [values[0], values[1]]);
+                        } else if (['>', '>=', '<', '<=', '=', '!=', '<>'].includes(compare)) {
+                            query = query.where(key, compare, value);
+                        }
                     }
+                    
                 }
             });
         }
@@ -120,10 +170,12 @@ export class MainService {
 
         let records;
         
+        console.log(query.toQuery());
         
         if (limit === -1) {
             records = await query;
         } else {
+
             const offset = (page - 1) * limit;
             records = await query.limit(limit).offset(offset);
         }

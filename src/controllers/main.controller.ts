@@ -4,14 +4,30 @@ import { MainService } from '@services/main.service';
 import fs from 'fs';
 import path from 'path';
 import { Helper } from '@utils/helper/helper';
+import { RouterConfigs } from 'src/configs/routerConfig.config';
+import { AuthService } from '@services/auth.service';
+import { UserService } from '@services/user.service';
 
 export class MainController {
 
-    static async create(req: Request, res: Response) {
+    static async create(req: Request, res: Response): Promise<any> {
         try {
-            const { table } = req.params;
-            const data = req.body;
-            const response = await MainService.createRecord(table, data);
+            const { router } = req.params;
+            if (!router) {
+                return res.status(404).json({ error: `Router ${router} not found` });
+            }
+            const table = RouterConfigs[router];
+            if (!table) {
+                return res.status(404).json({ error: `Table for router ${router} not found` });
+            }
+            const { decode, ...data } = req.body;
+            let response = null;
+            if(table.table === 'users'){
+                response = await UserService.create(data);
+            }else{
+
+                response = await MainService.createRecord(table.table, data);
+            }
             res.status(201).json(response);
         } catch (error: any) {
             console.error('Error inserting data:', error);
@@ -19,11 +35,22 @@ export class MainController {
         }
     }
 
-    static async put(req: Request, res: Response) {
+    static async put(req: Request, res: Response): Promise<any>{
         try {
-            const { table, id } = req.params;
-            const data = req.body;
-            const response = await MainService.updateRecord(table, parseInt(id), data);
+            const { router, id } = req.params;
+            if (!router) {
+                return res.status(404).json({ error: `Router ${router} not found` });
+            }
+            const table = RouterConfigs[router];
+            if (!table) {
+                return res.status(404).json({ error: `Table for router ${router} not found` });
+            }
+
+            if(!id) {
+                return res.status(404).json({ error:'id required'});
+            }
+            const { decode, ...data } = req.body;
+            const response = await MainService.updateRecord(table.table, parseInt(id), data);
             res.status(200).json(response);
         } catch (error: any) {
             console.error('Error updating data:', error);
@@ -31,10 +58,20 @@ export class MainController {
         }
     }
 
-    static async setIsDelete(req: Request, res: Response) {
+    static async setIsDelete(req: Request, res: Response) : Promise<any> {
         try {
-            const { table, id } = req.params;
-            const response = await MainService.softDeleteRecord(table, parseInt(id));
+            const { router, id } = req.params;
+            if (!router) {
+                return res.status(404).json({ error: `Router ${router} not found` });
+            }
+            const table = RouterConfigs[router];
+            if (!table) {
+                return res.status(404).json({ error: `Table for router ${router} not found` });
+            }
+            if(!id) {
+                return res.status(404).json({ error:'id required'});
+            }
+            const response = await MainService.softDeleteRecord(table.table, parseInt(id));
             res.status(200).json(response);
         } catch (error: any) {
             console.error('Error soft deleting data:', error);
@@ -42,10 +79,20 @@ export class MainController {
         }
     }
 
-    static async delete(req: Request, res: Response) {
+    static async delete(req: Request, res: Response) : Promise<any> {
         try {
-            const { table, id } = req.params;
-            const response = await MainService.deleteRecord(table, parseInt(id));
+            const { router, id } = req.params;
+            if (!router) {
+                return res.status(404).json({ error: `Router ${router} not found` });
+            }
+            const table = RouterConfigs[router];
+            if (!table) {
+                return res.status(404).json({ error: `Table for router ${router} not found` });
+            }
+            if(!id){
+                return res.status(404).json({ error:'id required'});
+            }
+            const response = await MainService.deleteRecord(table.table, parseInt(id));
             res.status(200).json(response);
         } catch (error: any) {
             console.error('Error deleting data:', error);
@@ -53,11 +100,18 @@ export class MainController {
         }
     }
 
-    static async get(req: Request, res: Response) {
+    static async get(req: Request, res: Response) : Promise<any> {
         try {
             console.log('vo');
             
-            const { table } = req.params;
+            const { router } = req.params;
+            if (!router) {
+                return res.status(404).json({ error: `Router ${router} not found` });
+            }
+            const table = RouterConfigs[router];
+            if (!table) {
+                return res.status(404).json({ error: `Table for router ${router} not found` });
+            }
             const conditions = req.query.condition ? JSON.parse(JSON.stringify(req.query.condition)) : [];
             // console.log(req.query.condition);
             
@@ -69,7 +123,7 @@ export class MainController {
             const page = parseInt(req.query.page?.toString() ?? '1', 10);
 
             const response = await MainService.getRecords(
-                table,
+                table.table,
                 conditions,
                 include,
                 includeBy,
@@ -80,7 +134,7 @@ export class MainController {
             );
             
             
-            const keyType = MainService.getKeyTypeFromModule(table); // Gọi hàm để lấy keyType
+            const keyType = MainService.getKeyTypeFromModule(router); // Gọi hàm để lấy keyType
             console.log('keyType:', keyType);
             if(keyType){
                 const helper = new Helper();

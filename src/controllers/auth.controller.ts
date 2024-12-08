@@ -1,9 +1,11 @@
+import { UserRole } from '@interfaces/permissions.interface';
 import { User } from '@interfaces/user.interface';
 import { AuthService } from '@services/auth.service';
 import { BcryptService } from '@services/bcrypt.service';
 import { NodeMailService } from '@services/nodeMailService.service';
 import { OTPService } from '@services/OPT.service';
 import { UserService } from '@services/user.service';
+import userRoleService from '@services/userRole.service';
 import { Router, Request, Response } from 'express';
 
 class AuthController {
@@ -101,14 +103,13 @@ class AuthController {
             }
             let accessToken: string | null;
             let refreshToken: string | null;
-       
-            accessToken = await AuthService.generateAccessToken(user);
-            refreshToken = await AuthService.generateRefreshToken(user);
+            let userRoles : UserRole[] = await userRoleService.getPmsFromUserId(user.id);
+            let userRoleIds = userRoles.map(role => role.role_id);
+
+            accessToken = await AuthService.generateAccessToken(user,userRoleIds );
+            refreshToken = await AuthService.generateRefreshToken(user, userRoleIds);
             if(refreshToken && accessToken){
-                const data = {
-                    refreshToken: refreshToken,
-                    user_id: user.id
-                }
+              
                 // const resultAddRefreshToken = refreshTokenService.create(data);
                  res.status(200).json({
                     refreshToken:refreshToken,

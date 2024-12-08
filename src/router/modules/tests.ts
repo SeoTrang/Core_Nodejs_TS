@@ -1,3 +1,5 @@
+import middlewaresMiddleware from "src/middlewares/middlewares.middleware";
+
 // src/router/modules/hello.ts
 module.exports = {
     keyType: {
@@ -13,7 +15,7 @@ module.exports = {
         
         // Đăng ký các route
         router.post(`/tests/create`, this.create.bind(this, model)); // Sử dụng bind để truyền model
-        router.get(`/tests/get1`, this.get.bind(this, model)); // Cũng sử dụng bind để truyền model
+        router.get(`/tests/get1`,middlewaresMiddleware.MiddlewareClient('tests'), this.get.bind(this, model)); // Cũng sử dụng bind để truyền model
     },
 
     async create(model: any, req: any, res: any, next: any) {

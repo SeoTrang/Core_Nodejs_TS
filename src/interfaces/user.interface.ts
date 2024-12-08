@@ -9,5 +9,4 @@ export interface User extends BaseEntity{
     password: string;
     refresh_token?: string;
     verifyEmail: number;
-    roles: Role[];
 }

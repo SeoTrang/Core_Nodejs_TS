@@ -5,10 +5,10 @@ import jwt from 'jsonwebtoken';
 
 export class AuthService {
     // Implement JWT authentication logic here
-    static async generateAccessToken(user: Partial<User>): Promise<string | null> {
+    static async generateAccessToken(user: Partial<User>, userRoleIds: number[]): Promise<string | null> {
         try {
             return jwt.sign(
-                { id: user.id, roles: user.roles },
+                { id: user.id, roles: userRoleIds },
                 process.env.ACCESS_TOKEN_SECRET as string,
                 { expiresIn: "1d" }
             );
@@ -18,10 +18,10 @@ export class AuthService {
         }
     }
 
-    static async generateRefreshToken(user: Partial<User>): Promise<string | null> {
+    static async generateRefreshToken(user: Partial<User>, userRoleIds: number[]): Promise<string | null> {
         try {
             return jwt.sign(
-                { id: user.id, roles: user.roles }, // Sửa `user.Role` thành `user.role` cho nhất quán
+                { id: user.id, roles: userRoleIds }, // Sửa `user.Role` thành `user.role` cho nhất quán
                 process.env.REFRESH_TOKEN_SECRET as string,
                 { expiresIn: 60 * 60 }
             );
@@ -40,10 +40,10 @@ export class AuthService {
 
             // Generate a new access token using the decoded user information from the refresh token
             const user: Partial<User> = {
-                id: decoded.id,
-                roles: decoded.roles,
+                id: decoded.id
             };
-            const accessToken = await this.generateAccessToken(user) ;
+            const userRoleIds: number[] = decoded.roleIds;
+            const accessToken = await this.generateAccessToken(user, userRoleIds) ;
             // Return the new access token
             return accessToken;
         } catch (err) {

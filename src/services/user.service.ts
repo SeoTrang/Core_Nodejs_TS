@@ -1,5 +1,6 @@
 import { User } from "@interfaces/user.interface";
 import db from "src/db/config.db";
+import userRoleService from "./userRole.service";
 
 
 export class UserService{
@@ -12,11 +13,12 @@ export class UserService{
         }
     }
 
-    static async create(user : Partial<User>): Promise<number>{
+    static async create(user: Partial<User>): Promise<number> {
         try {
-            let result = await db('users').insert(user);
-            return result[0];
-        } catch (error : any) {
+            const [userId] = await db('users').insert(user);
+            await userRoleService.createDefaultRole(userId);
+            return userId;
+        } catch (error: any) {
             throw new Error(error);
         }
     }
