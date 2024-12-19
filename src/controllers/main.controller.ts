@@ -1,12 +1,14 @@
 // src/controllers/MainController.ts
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { MainService } from '@services/main.service';
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
 import { Helper } from '@utils/helper/helper';
 import { RouterConfigs } from 'src/configs/routerConfig.config';
 import { AuthService } from '@services/auth.service';
 import { UserService } from '@services/user.service';
+
+
 
 export class MainController {
 
@@ -148,4 +150,18 @@ export class MainController {
             res.status(500).json({ error: error.message });
         }
     }
+
+
+    static async getProfile(req: Request, res: Response, next: NextFunction): Promise<any> {
+        try {
+            const user_id = req.body.decode.id;
+            if(!user_id) return res.status(404).json('user not found');
+            const user = await UserService.getProfile(req.body.decode.id);
+            return res.json({data: user}); 
+        } catch (error: any) {
+            console.error(error);
+            next(error);
+        }
+    }
+    
 }

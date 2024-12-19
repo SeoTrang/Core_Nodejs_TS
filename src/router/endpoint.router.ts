@@ -3,6 +3,9 @@ const router = Router();
 
 import { MainController } from 'src/controllers/main.controller';
 import middlewaresMiddleware from 'src/middlewares/middlewares.middleware';
+
+router.get('/profile', middlewaresMiddleware.checkLogin, MainController.getProfile)
+
 // Add a record to any table based on 'table'
 router.post('/:router',middlewaresMiddleware.GuardMiddleware, MainController.create);
 
