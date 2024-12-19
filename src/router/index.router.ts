@@ -62,7 +62,7 @@ const route = (app: Express): void => {
 
     const defaultRoutes = [
         { path: '/api/auth/', handler: auth },
-        { path: '/api/file/', handler: file },
+        { path: '/api/media/', handler: file },
         { path: '/api/', handler: endpoint },
     ];
 

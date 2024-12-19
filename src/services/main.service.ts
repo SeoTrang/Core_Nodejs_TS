@@ -69,7 +69,7 @@ export class MainService {
         let query = db(table).select('*');
 
         // console.log(query.toSQL());
-        console.log(conditions);
+        // console.log(conditions);
         
 
         if (Array.isArray(conditions)) {
@@ -98,11 +98,11 @@ export class MainService {
                     } else if (columnType.includes('date') || columnType.includes('datetime') || columnType.includes('timestamp')) {
                         value = new Date(value);
                     } else if (columnType.includes('varchar') || columnType.includes('text')) {
-                        console.log(value);
+                        // console.log(value);
                         
                         value = value.toString();
                     }
-                    console.log(value);
+                    // console.log(value);
                     
                     if(orWhere === 'or'){
 

@@ -9,7 +9,6 @@ import { Permission } from "@interfaces/permissions.interface";
 type permissionResponse = "forbidden" | "allowed" | "notFound";
 type Method = "GET" | "POST" | "DELETE" | "PUT";
 class Middleware {
-
   constructor() {
     // Bind `this` vào constructor, để đảm bảo phương thức này luôn giữ đúng ngữ cảnh.
     this.GuardMiddleware = this.GuardMiddleware.bind(this);
@@ -19,14 +18,13 @@ class Middleware {
   /*
     when table is public user only get. cant create, update and delete
     */
-   checkIsPublic(router: string): boolean {
+  checkIsPublic(router: string): boolean {
     try {
       // console.log(router);
 
-    
       let table = RouterConfigs[router];
       // console.log(table);
-      
+
       if (!table) return false;
       if (table.isPublic) return true;
       return false;
@@ -109,7 +107,6 @@ class Middleware {
         return res.status(400).json({ error: "Not found router or method" });
       }
       // console.log('run 2');
-      
 
       let isPublic = this.checkIsPublic(router);
       // console.log(isPublic);
@@ -157,33 +154,36 @@ class Middleware {
     }
   }
 
-
   MiddlewareClient(routerParam: string) {
-    return async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    return async (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ): Promise<any> => {
       try {
         // console.log("voooo");
-  
+
         const method = req.method as Method; // Lấy phương thức HTTP (GET, POST, PUT, DELETE)
         // check ispublic
-        const router = routerParam || req.params.router;  // Nếu không truyền vào thì lấy từ req.params
-  
+        const router = routerParam || req.params.router; // Nếu không truyền vào thì lấy từ req.params
+
         // console.log(method);
         // console.log(router);
-  
+
         if (!router || !method) {
           // console.log("run 1");
           return res.status(400).json({ error: "Not found router or method" });
         }
         // console.log('run 2');
-  
+
         let isPublic = this.checkIsPublic(router);
         // console.log(isPublic);
-  
+
         if (isPublic && method === "GET") {
           next();
           return;
         }
-  
+
         // check user is authenticated
         if (!req.headers.authorization)
           return res.status(401).json("invalid access token");
@@ -191,14 +191,14 @@ class Middleware {
         // console.log("token :", token);
         // console.log("env access token : ",process.env.ACCESS_TOKEN_SECRET);
         const decode = await AuthService.verifyAccessToken(token);
-  
+
         if (decode === "jwt expired") {
           // console.log("access token expired");
           return res.status(401).json("access token expired");
         } else if (!decode) return res.status(401).json("invalid access token");
-  
+
         req.body.decode = decode;
-  
+
         //check role user can access tables
         let pms: permissionResponse = await this.checkPermissionTable(
           decode,
@@ -209,18 +209,42 @@ class Middleware {
           res.status(403).json({ error: "Forbidden" });
           return;
         }
-  
+
         if (pms === "notFound") {
           res.status(404).json({ error: "Table not found" });
           return;
         }
-  
+
         // Tiến hành tiếp tục nếu được phép
         next();
       } catch (error) {
         res.status(500).json({ error: error });
       }
     };
+  }
+
+  async checkLogin(req: Request, res: Response, next: NextFunction): Promise<any> {
+    try {
+      if (!req.headers.authorization) {
+        
+        return res.status(401).json("Invalid access token");
+      }
+  
+      const token = req.headers.authorization.split(" ")[1];
+      const decode = await AuthService.verifyAccessToken(token);
+  
+      if (decode === "jwt expired") {
+        return res.status(401).json("Access token expired");
+      } else if (!decode) {
+        return res.status(401).json("Invalid access token");
+      }
+  
+      req.body.decode = decode; // Gán `decode` vào `req.body` nếu cần
+      next(); // Nếu hợp lệ, gọi `next`
+    } catch (error) {
+      console.error(error);
+      next(error); // Truyền lỗi vào Express error handler
+    }
   }
   
 }
