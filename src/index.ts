@@ -33,6 +33,7 @@ app.use(bodyParser.json());
 // Configure CORS
 app.use(cors({ origin: '*' }));
 
+
 // Define routes
 route(app);
 
