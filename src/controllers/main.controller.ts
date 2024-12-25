@@ -11,7 +11,6 @@ import { BadRequestError } from 'src/core/errors/error.response';
 import { PostAndUpdateDeleteResponse } from 'src/core/responses/response.response';
 
 
-
 export class MainController {
 
     static async create(req: Request, res: Response): Promise<any> {

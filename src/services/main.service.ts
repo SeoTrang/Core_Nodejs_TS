@@ -179,7 +179,6 @@ export class MainService {
         if (limit === -1) {
             records = await query;
         } else {
-
             const offset = (page - 1) * limit;
             records = await query.limit(limit).offset(offset);
         }
