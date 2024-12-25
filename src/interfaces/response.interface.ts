@@ -1,11 +1,13 @@
 export type GetResponse = {
-    status: string;
+    code: string;
+    message: string,
     recordTotal: number;
     recordFiltered: number;
     data: any;
 }
 
 export type PostUpdateDeleteResponse = {
-    status: string;
-    data: number;
+    message: string;
+    code: string;
+    data: any;
 }

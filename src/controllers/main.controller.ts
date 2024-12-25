@@ -7,6 +7,8 @@ import { Helper } from '@utils/helper/helper';
 import { RouterConfigs } from 'src/configs/routerConfig.config';
 import { AuthService } from '@services/auth.service';
 import { UserService } from '@services/user.service';
+import { BadRequestError } from 'src/core/errors/error.response';
+import { PostAndUpdateDeleteResponse } from 'src/core/responses/response.response';
 
 
 
@@ -16,11 +18,11 @@ export class MainController {
         try {
             const { router } = req.params;
             if (!router) {
-                return res.status(404).json({ error: `Router ${router} not found` });
+                throw new BadRequestError(`Router ${router} not found`);
             }
             const table = RouterConfigs[router];
             if (!table) {
-                return res.status(404).json({ error: `Table for router ${router} not found` });
+                throw new BadRequestError(`Table for router ${router} not found`);
             }
             const { decode, ...data } = req.body;
             let response = null;
@@ -30,54 +32,55 @@ export class MainController {
 
                 response = await MainService.createRecord(table.table, data);
             }
-            res.status(201).json(response);
+            res.status(201).json(new PostAndUpdateDeleteResponse(response));
         } catch (error: any) {
             console.error('Error inserting data:', error);
             res.status(500).json({ error: error.message });
         }
     }
 
-    static async put(req: Request, res: Response): Promise<any>{
+    static async put(req: Request, res: Response, next: NextFunction): Promise<any>{
         try {
             const { router, id } = req.params;
             if (!router) {
-                return res.status(404).json({ error: `Router ${router} not found` });
+                throw new BadRequestError(`Router ${router} not found`);
             }
             const table = RouterConfigs[router];
             if (!table) {
-                return res.status(404).json({ error: `Table for router ${router} not found` });
+                throw new BadRequestError(`Table for router ${router} not found`);
             }
 
             if(!id) {
-                return res.status(404).json({ error:'id required'});
+                throw new BadRequestError('id required');
             }
             const { decode, ...data } = req.body;
             const response = await MainService.updateRecord(table.table, parseInt(id), data);
-            res.status(200).json(response);
+            res.status(200).json(new PostAndUpdateDeleteResponse(response));
         } catch (error: any) {
             console.error('Error updating data:', error);
-            res.status(500).json({ error: error.message });
+            next(error);
         }
     }
 
-    static async setIsDelete(req: Request, res: Response) : Promise<any> {
+    static async setIsDelete(req: Request, res: Response, next: NextFunction) : Promise<any> {
         try {
             const { router, id } = req.params;
             if (!router) {
-                return res.status(404).json({ error: `Router ${router} not found` });
+                throw new BadRequestError(`Router ${router} not found`);
             }
             const table = RouterConfigs[router];
             if (!table) {
-                return res.status(404).json({ error: `Table for router ${router} not found` });
+                // return res.status(404).json({ error: `Table for router ${router} not found` });
+                throw new BadRequestError(`Table for router ${router} not found`);
             }
             if(!id) {
-                return res.status(404).json({ error:'id required'});
+                throw new BadRequestError('id required');
             }
             const response = await MainService.softDeleteRecord(table.table, parseInt(id));
-            res.status(200).json(response);
+            res.status(200).json(new PostAndUpdateDeleteResponse(response));
         } catch (error: any) {
             console.error('Error soft deleting data:', error);
-            res.status(500).json({ error: error.message });
+            next(error);
         }
     }
 
@@ -165,3 +168,5 @@ export class MainController {
     }
     
 }
+
+

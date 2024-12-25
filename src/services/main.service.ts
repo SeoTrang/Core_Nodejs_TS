@@ -10,7 +10,8 @@ export class MainService {
     static async createRecord(table: string, data: any): Promise<PostUpdateDeleteResponse> {
         const [id] = await db(table).insert(data);
         return {
-            status: 'success',
+            message: 'inserted successfully',
+            code: 'success',
             data: id,
         };
     }
@@ -19,7 +20,8 @@ export class MainService {
         const affectedRows = await db(table).where({ id }).update(data);
         if (affectedRows) {
             return {
-                status: 'success',
+                message: 'inserted successfully',
+                code: 'success',
                 data: id,
             };
         }
@@ -30,7 +32,8 @@ export class MainService {
         const affectedRows = await db(table).where({ id }).update({ is_deleted: 1 });
         if (affectedRows) {
             return {
-                status: 'success',
+                message: 'inserted successfully',
+                code: 'success',
                 data: id,
             };
         }
@@ -41,7 +44,8 @@ export class MainService {
         const affectedRows = await db(table).where({ id }).del();
         if (affectedRows) {
             return {
-                status: 'success',
+                message: 'inserted successfully',
+                code: 'success',
                 data: id,
             };
         }
@@ -181,7 +185,8 @@ export class MainService {
         }
 
         return {
-            status: 'success',
+            code: 'success',
+            message: 'Request success!',
             recordTotal: totalRecords,
             recordFiltered: records.length,
             data: records,

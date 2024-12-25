@@ -6,10 +6,11 @@ import { NodeMailService } from '@services/nodeMailService.service';
 import { OTPService } from '@services/OPT.service';
 import { UserService } from '@services/user.service';
 import userRoleService from '@services/userRole.service';
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { ErrorMessage } from 'src/core/errors/error.response';
 
 class AuthController {
-    async register (req: Request, res: Response) : Promise<void>  {
+    async register (req: Request, res: Response, next: NextFunction) : Promise<void>  {
         try {
             // addressService.getAll();
             // console.log(req.body);
@@ -67,16 +68,13 @@ class AuthController {
             user.avatar = randomAvatar;
 
             const result = await UserService.create(user);
-            if(result){
-                res.status(200).json('success');
-                return
-            } 
-             res.status(400).json('error when insert to database');
-             return
-        } catch (error) {
+            res.status(200).json('success');
+            return
+        } catch (error: any) {
             console.log(error);
-            res.status(500).json('server error');
-            return 
+            // res.status(500).json('server error');
+            // return 
+            next(new ErrorMessage(error?.message, 500));
         }
     }
 
