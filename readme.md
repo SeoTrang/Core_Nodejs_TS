@@ -1,4 +1,26 @@
-# Core NodeJS TypeScript Project
+<p align="center">
+  <a href="http://nodejs.org/" target="blank"><img src="https://nodejs.org/static/images/logo.svg" width="200" alt="Node.js Logo" /></a>
+</p>
+
+[circleci-image]: https://img.shields.io/circleci/build/github/nodejs/node/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nodejs/node
+
+  <p align="center">A powerful <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/org/nodejs" target="_blank"><img src="https://img.shields.io/npm/v/node.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/org/nodejs" target="_blank"><img src="https://img.shields.io/npm/l/node.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/org/nodejs" target="_blank"><img src="https://img.shields.io/npm/dm/node.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nodejs/node" target="_blank"><img src="https://img.shields.io/circleci/build/github/nodejs/node/master" alt="CircleCI" /></a>
+<a href="https://coveralls.io/github/nodejs/node?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nodejs/node/badge.svg?branch=master#9" alt="Coverage" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/node#backer" target="_blank"><img src="https://img.shields.io/badge/Backers-Open%20Collective-41B883.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/node#sponsor" target="_blank"><img src="https://img.shields.io/badge/Sponsors-Open%20Collective-41B883.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/nodejs" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
+    <a href="https://opencollective.com/node#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nodejs" target="_blank"><img src="https://img.shields.io/twitter/follow/nodejs.svg?style=social&label=Follow"></a>
+</p>
+
+# Core NodeJS Project Typescript
 This project is a Node.js application built with TypeScript. It uses Express for the web server, Knex.js for database migrations and queries, and various other libraries for handling authentication, file uploads, and more.
 
 ##### Table of Contents
