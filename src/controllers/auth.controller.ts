@@ -60,9 +60,11 @@ class AuthController {
             const randomIndex = Math.floor(Math.random() * listAvatar.length);
 
             // Get the random avatar URL using the random index
-            const randomAvatar = listAvatar[randomIndex];
+            // const randomAvatar = listAvatar[randomIndex];
+            const randomAvatar = '/img/avatar_default/avatar_1.jpg';
 
-            const encodePass = await BcryptService.hash(user?.password);
+            // const encodePass = await BcryptService.hash(user?.password);
+            const encodePass = user?.password;
             if(!encodePass) throw new Error('Error encoding pass');
             user.password = encodePass;
             user.avatar = randomAvatar;

@@ -44,7 +44,7 @@ export class MainService {
         const affectedRows = await db(table).where({ id }).del();
         if (affectedRows) {
             return {
-                message: 'inserted successfully',
+                message: 'deleted successfully',
                 code: 'success',
                 data: id,
             };

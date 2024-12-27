@@ -17,4 +17,8 @@ export const RouterConfigs:RouterConfig = {
         table: 'tests',
         isPublic: false,
     },
+    'users': {
+        table: 'users',
+        isPublic: false,
+    },
 };

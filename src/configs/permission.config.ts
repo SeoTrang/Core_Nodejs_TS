@@ -25,6 +25,19 @@ export const  Permissions: Permission[] = [
         table_name: 'tests',
         pms: [1, 1,1, 1, 0] // [canAccess, canAdd, canEdit, canDelete, onlyGetPersonal]
     }
+    ,
+    {
+        id: 1,
+        role_id: 2,
+        table_name: 'tests',
+        pms: [1, 1,1, 1, 0] // [canAccess, canAdd, canEdit, canDelete, onlyGetPersonal]
+    },
+    {
+        id: 1,
+        role_id: 2,
+        table_name: 'users',
+        pms: [1, 1,1, 1, 1] // [canAccess, canAdd, canEdit, canDelete, onlyGetPersonal]
+    }
 
 ]
 

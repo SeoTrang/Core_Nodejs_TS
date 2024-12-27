@@ -1,5 +1,6 @@
 import { Express, Router } from "express";
 import endpoint from "./endpoint.router";
+import destroyed from "./destroy.router";
 import auth from "./auth.router";
 import file from "./file.router";
 import path from "path";
@@ -71,6 +72,7 @@ const route = (app: Express): void => {
   const defaultRoutes = [
     { path: "/api/auth/", handler: auth },
     { path: "/api/media/", handler: file },
+    { path: "/api/destroy/", handler: destroyed },
     { path: "/api/", handler: endpoint },
   ];
 

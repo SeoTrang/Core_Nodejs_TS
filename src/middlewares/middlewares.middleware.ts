@@ -47,14 +47,14 @@ class Middleware {
       (item) =>
         item.table_name === table.table && decode.roles.includes(item.role_id)
     );
-    console.log(permission);
+    // console.log(permission);
 
     if (!permission || permission.length <= 0) return "forbidden";
 
     // Tiến hành các kiểm tra hoặc xử lý tiếp theo
     if (method === "GET") {
       for (let index = 0; index < permission.length; index++) {
-        if (permission[index].pms[1] === 1) return "allowed";
+        if (permission[index].pms[0] === 1) return "allowed";
       }
       return "forbidden";
     }
@@ -62,7 +62,7 @@ class Middleware {
     if (method === "POST") {
       // Tương tự với POST
       for (let index = 0; index < permission.length; index++) {
-        if (permission[index].pms[2] === 1) return "allowed";
+        if (permission[index].pms[1] === 1) return "allowed";
       }
       return "forbidden";
     }
@@ -70,7 +70,7 @@ class Middleware {
     if (method === "PUT") {
       // Kiểm tra với PUT
       for (let index = 0; index < permission.length; index++) {
-        if (permission[index].pms[3] === 1) return "allowed";
+        if (permission[index].pms[2] === 1) return "allowed";
       }
       return "forbidden";
     }
@@ -78,7 +78,7 @@ class Middleware {
     if (method === "DELETE") {
       // Kiểm tra với DELETE
       for (let index = 0; index < permission.length; index++) {
-        if (permission[index].pms[4] === 1) return "allowed";
+        if (permission[index].pms[3] === 1) return "allowed";
       }
       return "forbidden";
     }
@@ -244,6 +244,49 @@ class Middleware {
     } catch (error) {
       console.error(error);
       next(error); // Truyền lỗi vào Express error handler
+    }
+  }
+
+  async GuardDestroyMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
+    try {
+      
+
+      // check user is authenticated
+      if (!req.headers.authorization)
+        return res.status(401).json("invalid access token");
+      const token = req.headers.authorization.split(" ")[1]; //get token
+      // console.log("token :", token);
+      // console.log("env access token : ",process.env.ACCESS_TOKEN_SECRET);
+      const decode = await AuthService.verifyAccessToken(token);
+
+      if (decode === "jwt expired") {
+        console.log("access token expired");
+        return res.status(401).json("access token expired");
+      } else if (!decode) return res.status(401).json("invalid access token");
+
+      req.body.decode = decode;
+
+      const router = req.params.router;
+      let table = RouterConfigs[router];
+      let permission: Permission[] = Permissions.filter(
+        (item) =>
+          item.table_name === table.table && decode.roles.includes(item.role_id)
+      );
+      for (let index = 0; index < permission.length; index++) {
+        if (permission[index].pms[4] === 1) {
+          next();
+          return;
+        }
+      }
+      
+      return res.status(403).json({ error: "Forbidden" });
+    } catch (error) {
+      console.error(error);
+      next(error);
     }
   }
   
