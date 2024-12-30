@@ -17,6 +17,7 @@ import route from "./router/index.router";
 
 // Connect to DB
 import "./db/config.db";
+import swaggerDocs from "./swagger/swagger";
 
 // Initialize Express app
 const app: Express = express();
@@ -37,6 +38,7 @@ app.use(cors({ origin: '*' }));
 // Define routes
 route(app);
 
+swaggerDocs(app, port);
 // Determine whether to use HTTP or HTTPS based on the environment
 const server = process.env.NODE_ENV === 'production'
     ? https.createServer({
