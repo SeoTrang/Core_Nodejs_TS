@@ -165,8 +165,7 @@ To rollback the last migration:
         - Get Records: GET /api/:router
         - Update Record: PUT /api/:router/:id
         - Delete Record: DELETE /api/:router/:id
-        - Soft Delete Record: DELETE /api/:router/destroy/:id
-
+    Destroy records: DELETE /api/destroy/:router/:id
 ##### API Endpoints
 This project is licensed under the MIT License.
     
