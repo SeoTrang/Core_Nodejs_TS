@@ -7,7 +7,7 @@ import { Helper } from '@utils/helper/helper';
 import { RouterConfigs } from 'src/configs/routerConfig.config';
 import { AuthService } from '@services/auth.service';
 import { UserService } from '@services/user.service';
-import { BadRequestError } from 'src/core/errors/error.response';
+import { BadRequestError, NotFoundError } from 'src/core/errors/error.response';
 import { PostAndUpdateDeleteResponse } from 'src/core/responses/response.response';
 
 
@@ -83,38 +83,38 @@ export class MainController {
         }
     }
 
-    static async delete(req: Request, res: Response) : Promise<any> {
+    static async delete(req: Request, res: Response, next: NextFunction) : Promise<any> {
         try {
             const { router, id } = req.params;
             if (!router) {
-                return res.status(404).json({ error: `Router ${router} not found` });
+                throw new NotFoundError(`Router ${router} not found`);
             }
             const table = RouterConfigs[router];
             if (!table) {
-                return res.status(404).json({ error: `Table for router ${router} not found` });
+                throw new NotFoundError(`Router ${router} not found`);
             }
             if(!id){
-                return res.status(404).json({ error:'id required'});
+                throw new BadRequestError('id required');
             }
             const response = await MainService.deleteRecord(table.table, parseInt(id));
             res.status(200).json(response);
         } catch (error: any) {
             console.error('Error deleting data:', error);
-            res.status(500).json({ error: error.message });
+            next(error);
         }
     }
 
-    static async get(req: Request, res: Response) : Promise<any> {
+    static async get(req: Request, res: Response, next: NextFunction) : Promise<any> {
         try {
             console.log('vo');
             
             const { router } = req.params;
             if (!router) {
-                return res.status(404).json({ error: `Router ${router} not found` });
+                throw new NotFoundError(`Router ${router} not found`);
             }
             const table = RouterConfigs[router];
             if (!table) {
-                return res.status(404).json({ error: `Table for router ${router} not found` });
+                throw new NotFoundError(`Router ${router} not found`);
             }
             const conditions = req.query.condition ? JSON.parse(JSON.stringify(req.query.condition)) : [];
             // console.log(req.query.condition);
@@ -149,7 +149,7 @@ export class MainController {
             res.status(200).json(response);
         } catch (error: any) {
             console.error('Error fetching data:', error.message);
-            res.status(500).json({ error: error.message });
+            next(error);
         }
     }
 
@@ -157,7 +157,7 @@ export class MainController {
     static async getProfile(req: Request, res: Response, next: NextFunction): Promise<any> {
         try {
             const user_id = req.body.decode.id;
-            if(!user_id) return res.status(404).json('user not found');
+            if(!user_id) throw new NotFoundError('User not found');
             const user = await UserService.getProfile(req.body.decode.id);
             return res.json({data: user}); 
         } catch (error: any) {

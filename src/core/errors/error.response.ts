@@ -1,12 +1,11 @@
-// Định nghĩa mã trạng thái lỗi như một đối tượng
 const ErrorResponseStatus = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     BAD_REQUEST: 400,
     INTERNAL_SERVER_ERROR: 500,
     UNAUTHORIZED: 401,
+    CONFLICT: 409,
 };
-
 
 // Base Error Class
 class ErrorMessage extends Error {
@@ -54,6 +53,13 @@ class UnauthorizedError extends ErrorMessage {
     }
 }
 
+class ConflictError extends ErrorMessage {
+    constructor(message: string) {
+        super(message, ErrorResponseStatus.CONFLICT);
+        this.name = 'ConflictError';
+    }
+}
+
 export {
     ErrorMessage,
     ForbiddenError,
@@ -61,5 +67,6 @@ export {
     BadRequestError,
     InternalServerError,
     UnauthorizedError,
+    ConflictError,
     ErrorResponseStatus
 }

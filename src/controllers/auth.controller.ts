@@ -7,7 +7,7 @@ import { OTPService } from '@services/OPT.service';
 import { UserService } from '@services/user.service';
 import userRoleService from '@services/userRole.service';
 import { Router, Request, Response, NextFunction } from 'express';
-import { ErrorMessage } from 'src/core/errors/error.response';
+import { BadRequestError, ConflictError, ErrorMessage, NotFoundError } from 'src/core/errors/error.response';
 
 class AuthController {
     async register (req: Request, res: Response, next: NextFunction) : Promise<void>  {
@@ -16,15 +16,13 @@ class AuthController {
             // console.log(req.body);
             let user: Partial<User> = req.body;
             if(!user.email || !user.password) {
-                res.status(400).json('missing data')
-                return 
+                throw new BadRequestError('missing data');
             }
             if(user.email){
                 let user_temp = await UserService.findByEmail(user.email);
                 // console.log(user_temp);
                 if(user_temp){
-                    res.status(409).json("Email đã tồn tại")
-                    return
+                    throw new ConflictError('email already exists');
                 } 
             }
 
@@ -69,37 +67,30 @@ class AuthController {
             user.password = encodePass;
             user.avatar = randomAvatar;
 
-            const result = await UserService.create(user);
+            await UserService.create(user);
             res.status(200).json('success');
             return
         } catch (error: any) {
-            console.log(error);
-            // res.status(500).json('server error');
-            // return 
-            next(new ErrorMessage(error?.message, 500));
+            next(error);
         }
     }
 
-    async login (req: Request, res: Response) : Promise<void>{
+    async login (req: Request, res: Response, next: NextFunction) : Promise<void>{
         try {
             const data: Partial<User> = req.body;
             console.log(data);
             if(!data.email || !data.password) throw new Error('Missing email or password')
             const user : User = await UserService.findByEmail(data.email);
-            console.log(user);
             
             if(!user) {
-                res.status(404).json("not found");
-                return 
+                throw new NotFoundError('User not found')
             }
             if(!user.verifyEmail) {
-                res.status(200).json('email is not verify');
-                return 
+                throw new BadRequestError('email is not verify');
             }
                 
             if(!await BcryptService.compare(data.password,user.password)) {
-                res.status(404).json('email or pass invalid');
-                return 
+                throw new BadRequestError('email or pass invalid');
             }
             let accessToken: string | null;
             let refreshToken: string | null;
@@ -121,9 +112,7 @@ class AuthController {
              res.status(500).json('server error');
              return
         } catch (error) {
-            console.log(error);
-             res.status(500).json('server error');
-             return
+             next(error);
         }
     }
 
@@ -148,10 +137,11 @@ class AuthController {
     }
     
 
-    async sendEmail (req: Request,res: Response) : Promise<any>{
+    async sendEmail (req: Request,res: Response, next: NextFunction) : Promise<any>{
         try {
             const otp = Math.floor(1000 + Math.random() * 9000);
             const email = req.body.email;
+            if(!email) throw new BadRequestError('email is required');
             const result_send_email = await NodeMailService.sendMail(email,otp);
             if(result_send_email){
                 await OTPService.create({
@@ -161,15 +151,15 @@ class AuthController {
             }
             return res.status(200).json('success');
         } catch (error: any) {
-            console.log(error);
-            return res.status(500).json({error: error.message});
+            next(error);
         }
     }
 
-     async verifyEmail (req: Request,res: Response) : Promise<any> {
+     async verifyEmail (req: Request,res: Response, next: NextFunction) : Promise<any> {
         try {
             const email = req.body.email;
             const otp = req.body.otp;
+            if(!email || !otp) throw new BadRequestError('email or otp is required');
             const result = await OTPService.getByEmailAndNotExpired({email: email, otp: otp});
             console.log(result);
             if(result) {
@@ -179,20 +169,19 @@ class AuthController {
                 await UserService.update(user.id,{verifyEmail: 1});
                 return res.status(200).json(result);
             }else{
-                return res.status(400).json({ error: 'User not found' }); 
+                throw new NotFoundError('User not found');
             }
                 
             
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({error: error});
+            next(error);
         }
     }
 
-    async forgotPassword (req: Request,res: Response): Promise<any> {
+    async forgotPassword (req: Request,res: Response, next: NextFunction): Promise<any> {
         try {
             const {email, password} = req.body;
-            if(!email || !password) throw new Error('email or password is required');
+            if(!email || !password) throw new BadRequestError('email or password is required');
             const encodePass = await BcryptService.hash(password);
            
             const user = await UserService.findByEmail(email);  
@@ -202,11 +191,10 @@ class AuthController {
             if (result) {
                 return res.status(200).json({ message: 'Password updated successfully', result });
             } else {
-                return res.status(400).json({ error: 'Password update failed' });  // Nếu không có kết quả từ update, trả về lỗi
+                throw new NotFoundError('Password update failed');
             }
         } catch (error: any) {
-            console.log(error);
-            return res.status(500).json({error: error.message});
+            next(error);
         }
     }
 }
